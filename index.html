@@ -185,7 +185,8 @@ footer p{margin:0}
 
   <!-- ══════════ 내 대출·반납 ══════════ -->
   <section class="tab-panel" id="tab-loans" role="tabpanel" aria-labelledby="tabBtn-loans">
-    <h2 class="sec-title">대출 중 <span class="small muted" id="loanCount"></span></h2>
+    <h2 class="sec-title">가족 통합 대출 중 <span class="small muted" id="loanCount"></span></h2>
+    <p class="small muted" style="margin:-2px 0 8px">가족회원 통합 조회 기준 · 본인 5권 · 가족 0권</p>
     <div class="card pad">
       <ul class="loans" id="loanList"></ul>
       <p class="empty" id="loanEmpty" style="border:1px dashed var(--line)">대출 중인 책이 없어요.</p>
@@ -1673,14 +1674,14 @@ const store = {
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 const INITIAL_LOANS = [
-  {title:'[학콕3-4-4] 우리 동네 청수마트 : 이작은 그림책', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'엄마, 나 안 졸려! : 리커버', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'바람숲 도서관', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'불꽃놀이', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'조마조마 북', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'}
+  {title:'[학콕3-4-4] 우리 동네 청수마트 : 이작은 그림책', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'엄마, 나 안 졸려! : 리커버', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'바람숲 도서관', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'불꽃놀이', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'조마조마 북', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'}
 ];
 let FAV = new Set(store.get('heungbu_fav_v1', []));
-let LOANS = store.get('heungbu_loans_v3', INITIAL_LOANS);
+let LOANS = store.get('heungbu_loans_v4', INITIAL_LOANS);
 
 /* ────────── 날짜 도구 ────────── */
 const MS = 86400000;
@@ -1845,8 +1846,8 @@ form.addEventListener('submit', e => {
   html += '</dl>';
   calcResult.innerHTML = html;
   calcResult.classList.add('show');
-  LOANS.push({title, type, loanDate: ymd(loanDate), interloan: document.getElementById('l_inter').checked, extended: false, added: ymd(new Date())});
-  store.set('heungbu_loans_v3', LOANS);
+  LOANS.push({title, borrower:'본인', type, loanDate: ymd(loanDate), interloan: document.getElementById('l_inter').checked, extended: false, added: ymd(new Date())});
+  store.set('heungbu_loans_v4', LOANS);
   document.getElementById('l_title').value = '';
   document.getElementById('l_inter').checked = false;
   renderLoans();
@@ -1861,7 +1862,7 @@ function loanItem(l, i){
   const txt = dday < 0 ? 'D+' + Math.abs(dday) + ' 연체' : (dday === 0 ? 'D-DAY' : 'D-' + dday);
   return '<li class="loan">' +
     '<div class="loan-top"><div><h4>' + esc(l.title) + '</h4>' +
-      '<div class="who">' + (l.interloan ? '상호대차 · ' : '') + '대출 ' + l.loanDate + '</div></div>' +
+      '<div class="who">' + (l.borrower ? esc(l.borrower) + ' · ' : '') + (l.interloan ? '상호대차 · ' : '') + '대출 ' + l.loanDate + '</div></div>' +
       '<span class="dday ' + cls + '">' + txt + '</span></div>' +
     '<div class="who">반납 ' + labelFull(due) + (l.extended ? ' · 7일 연장함' : (c.shifted ? ' · 다음 개관일' : '')) + '</div>' +
     '<div class="loan-actions">' +
@@ -1887,14 +1888,14 @@ function renderLoans(){
 document.getElementById('loanList').addEventListener('click', e => {
   const ext = e.target.closest('[data-ext]');
   const del = e.target.closest('[data-del]');
-  if (ext){ const i = Number(ext.dataset.ext); LOANS[i].extended = !LOANS[i].extended; store.set('heungbu_loans_v3', LOANS); renderLoans(); }
-  if (del){ const i = Number(del.dataset.del); LOANS.splice(i, 1); store.set('heungbu_loans_v3', LOANS); renderLoans(); }
+  if (ext){ const i = Number(ext.dataset.ext); LOANS[i].extended = !LOANS[i].extended; store.set('heungbu_loans_v4', LOANS); renderLoans(); }
+  if (del){ const i = Number(del.dataset.del); LOANS.splice(i, 1); store.set('heungbu_loans_v4', LOANS); renderLoans(); }
 });
 
 document.getElementById('resetAll').addEventListener('click', () => {
   if (!confirm('찜 목록과 대출 일정을 모두 지울까요?')) return;
   FAV = new Set(); LOANS = [];
-  store.set('heungbu_fav_v1', []); store.set('heungbu_loans_v3', []);
+  store.set('heungbu_fav_v1', []); store.set('heungbu_loans_v4', []);
   render(); renderLoans();
 });
 
