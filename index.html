@@ -160,6 +160,9 @@ main{padding:12px 0 32px}
 .kv{display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:13.5px; margin:8px 0 0}
 .kv dt{color:var(--ink-soft); font-weight:700}
 .kv dd{margin:0; font-weight:700}
+.lib-switch{display:grid; grid-template-columns:1fr 1fr; gap:6px; background:#efeae1; padding:4px; border-radius:12px}
+.lib-opt{border:0; background:transparent; padding:8px 10px; border-radius:9px; font-size:13px; font-weight:700; color:var(--ink-soft); cursor:pointer; transition:all .15s ease}
+.lib-opt[aria-pressed="true"]{background:#fff; color:var(--green-ink); box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .sec-title{font-size:15px; font-weight:800; margin:16px 0 8px; display:flex; align-items:center; gap:6px}
 .sec-title:first-child{margin-top:0}
 footer{border-top:1px solid var(--line); padding:14px 0 26px; color:var(--ink-soft); font-size:11.5px}
@@ -172,7 +175,7 @@ footer p{margin:0}
 <header class="hero">
   <div class="wrap">
     <p class="kicker">22년생 · 만 4~5세</p>
-    <h1>흥부작은도서관 <span>추천 그림책 30권</span></h1>
+    <h1 id="heroTitle">흥부작은도서관 <span>추천 그림책 30권</span></h1>
     <p class="sync">반영 기준: 2026-11-22 13:30</p>
   </div>
 </header>
@@ -189,6 +192,10 @@ footer p{margin:0}
   <!-- ══════════ 추천도서 ══════════ -->
   <section class="tab-panel active" id="tab-books" role="tabpanel" aria-labelledby="tabBtn-books">
     <div class="toolbar">
+      <div class="lib-switch" id="baseLibSwitch" role="group" aria-label="기준 도서관 선택">
+        <button class="lib-opt" type="button" data-lib="흥부작은도서관" aria-pressed="true">📍 흥부작은도서관</button>
+        <button class="lib-opt" type="button" data-lib="북울진도서관" aria-pressed="false">📍 북울진도서관</button>
+      </div>
       <div class="searchbox" id="searchBox">
         <span class="ico">🔍</span>
         <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="제목·저자·출판사로 찾기 (예: 수박)">
@@ -196,8 +203,8 @@ footer p{margin:0}
       </div>
       <div class="chips" id="chips" role="group" aria-label="빠른 필터">
         <button class="chip" data-filter="all" aria-pressed="true">전체</button>
-        <button class="chip hb" data-filter="here" aria-pressed="false">✅ 흥부 바로 대출</button>
-        <button class="chip il" data-filter="need" aria-pressed="false">🔄 상호대차 필요</button>
+        <button class="chip hb" id="hereChip" data-filter="here" aria-pressed="false">✅ 흥부 바로 대출</button>
+        <button class="chip il" id="needChip" data-filter="need" aria-pressed="false">🔄 상호대차 필요</button>
         <button class="chip" data-filter="tag:상상·모험" aria-pressed="false">상상·모험</button>
         <button class="chip" data-filter="tag:생활·감정" aria-pressed="false">생활·감정</button>
         <button class="chip" data-filter="tag:사회성·우정" aria-pressed="false">사회성·우정</button>
@@ -1749,7 +1756,12 @@ const resultLine = document.getElementById('resultLine');
 const emptyMsg = document.getElementById('emptyMsg');
 const qEl = document.getElementById('q');
 const searchBox = document.getElementById('searchBox');
+const hereChip = document.getElementById('hereChip');
+const needChip = document.getElementById('needChip');
+const heroTitle = document.getElementById('heroTitle');
 let filter = 'all';
+let baseLib = store.get('heungbu_base_lib_v1', '흥부작은도서관');
+if (baseLib !== '흥부작은도서관' && baseLib !== '북울진도서관') baseLib = '흥부작은도서관';
 
 function esc(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1757,19 +1769,26 @@ function esc(s){
 function statusClass(st){ return st === '대출가능' ? 'ok' : (st === '대출중' ? 'no' : 'na'); }
 const SHORT = {'흥부작은도서관':'흥부','북울진도서관':'북울진','울진남부도서관':'남부','울진작은도서관':'울진작은','근남작은도서관':'근남','매화작은도서관':'매화','기성작은도서관':'기성','평해작은도서관':'평해','온정작은도서관':'온정'};
 function shortName(n){ return SHORT[n] || n; }
+function getView(b){
+  const hit = (b.libs || []).find(l => l.n === baseLib);
+  if (hit) return {need:false, status:hit.status, call:hit.call, loc:hit.loc};
+  const avail = (b.libs || []).some(l => l.status === '대출가능');
+  return {need:true, status:avail ? '대출가능' : b.status, call:b.call, loc:b.loc};
+}
 function searchUrl(b){
   const base = 'https://lib.uljin.go.kr/content/01search/01_01.php?TAG1_cmd=IT&sh_TYPE=dan_book&TAG1_keyword=';
   const key = b.title.replace(/\s*:\s*.*$/, '').replace(/^\(.*?\)\s*/, '');
   return base + encodeURIComponent(key);
 }
-function badge(b){
-  if (b.need) return '<span class="badge sm il">🔄 상호대차 필요</span>';
-  if (b.status === '대출가능') return '<span class="badge sm hb">✅ 흥부 바로 대출</span>';
-  return '<span class="badge sm wait">📕 흥부 소장 · 대출중</span>';
+function badge(v){
+  const sn = shortName(baseLib);
+  if (v.need) return '<span class="badge sm il">🔄 상호대차 필요</span>';
+  if (v.status === '대출가능') return '<span class="badge sm hb">✅ ' + sn + ' 바로 대출</span>';
+  return '<span class="badge sm wait">📕 ' + sn + ' 소장 · 대출중</span>';
 }
 function libRows(b){
   return b.libs.map(l =>
-    '<li class="dlib' + (l.n === '흥부작은도서관' ? ' here' : '') + '">' +
+    '<li class="dlib' + (l.n === baseLib ? ' here' : '') + '">' +
       '<span class="ln">' + esc(shortName(l.n)) + '</span>' +
       '<span class="lc" title="' + esc(l.call + ' · ' + l.loc) + '">' + esc(l.call) + '</span>' +
       '<span class="ls ' + statusClass(l.status) + '">' + esc(l.status) + '</span>' +
@@ -1778,14 +1797,15 @@ function libRows(b){
 }
 function card(b){
   const isFav = FAV.has(b.id);
-  const cls = b.need ? 'il' : 'hb';
+  const v = getView(b);
+  const cls = v.need ? 'il' : 'hb';
   const open = OPEN.has(b.id);
   return '<article class="book ' + cls + (open ? ' open' : '') + '" data-id="' + b.id + '">' +
     '<div class="book-head">' +
       '<button class="book-toggle" type="button" aria-expanded="' + open + '" aria-controls="d-' + b.id + '">' +
         '<span class="tline"><span class="ttl">' + esc(b.title) + '</span><span class="chev" aria-hidden="true">▼</span></span>' +
-        '<span class="subline">' + badge(b) +
-          '<span class="st ' + statusClass(b.status) + '">' + esc(b.status) + '</span>' +
+        '<span class="subline">' + badge(v) +
+          '<span class="st ' + statusClass(v.status) + '">' + esc(v.status) + '</span>' +
           '<span class="meta2">' + esc(b.author || '-') + '</span>' +
         '</span>' +
       '</button>' +
@@ -1793,11 +1813,11 @@ function card(b){
     '</div>' +
     '<div class="detail-wrap" id="d-' + b.id + '"' + (open ? '' : ' inert') + '>' +
       '<div class="detail"><div class="detail-in">' +
-        '<div class="dcall"><span>대표 청구기호</span><span class="call">' + esc(b.call) + '</span><span>' + esc(b.loc) + '</span></div>' +
+        '<div class="dcall"><span>대표 청구기호</span><span class="call">' + esc(v.call) + '</span><span>' + esc(v.loc) + '</span></div>' +
         '<ul class="dlibs">' + libRows(b) + '</ul>' +
         '<p class="reason">💬 ' + esc(b.reason) + '</p>' +
         '<div class="drow">' + b.tags.map(t => '<span class="pill tags">' + esc(t) + '</span>').join('') +
-          (b.need
+          (v.need && baseLib === '흥부작은도서관'
             ? '<a class="linkbtn" href="' + searchUrl(b) + '" target="_blank" rel="noopener">🔄 상호대차 신청하기 ↗</a>' +
               '<button type="button" class="linkbtn" data-copy-req="' + esc(b.title) + '" style="background:var(--accent-bg);border-color:var(--accent);color:var(--accent);cursor:pointer">📋 요청 문구 복사</button>'
             : '<a class="linkbtn" href="' + searchUrl(b) + '" target="_blank" rel="noopener">도서관에서 보기 ↗</a>') +
@@ -1807,28 +1827,59 @@ function card(b){
   '</article>';
 }
 
+function syncBaseLibUI(){
+  const sn = shortName(baseLib);
+  const isHB = baseLib === '흥부작은도서관';
+  const countN = isHB ? BOOKS.length : BOOKS.filter(b => !getView(b).need).length;
+  heroTitle.innerHTML = esc(baseLib) + ' <span>추천 그림책 ' + countN + '권</span>';
+  hereChip.textContent = '✅ ' + sn + ' 바로 대출';
+  needChip.hidden = !isHB;
+  if (!isHB && filter === 'need') {
+    filter = 'all';
+    document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.filter === 'all')));
+  }
+  document.querySelectorAll('#baseLibSwitch .lib-opt').forEach(btn => {
+    btn.setAttribute('aria-pressed', String(btn.dataset.lib === baseLib));
+  });
+}
+
 function render(){
+  syncBaseLibUI();
+  const isHB = baseLib === '흥부작은도서관';
   const q = qEl.value.trim().toLowerCase();
   searchBox.classList.toggle('has-value', qEl.value.length > 0);
-  const list = BOOKS.filter(b => {
+  const baseList = isHB ? BOOKS : BOOKS.filter(b => !getView(b).need);
+  const list = baseList.filter(b => {
+    const v = getView(b);
     let ok = true;
-    if (filter === 'here') ok = !b.need && b.status === '대출가능';
-    else if (filter === 'need') ok = b.need;
+    if (filter === 'here') ok = !v.need && v.status === '대출가능';
+    else if (filter === 'need') ok = v.need;
     else if (filter === 'fav') ok = FAV.has(b.id);
     else if (filter.indexOf('tag:') === 0) ok = b.tags.indexOf(filter.slice(4)) >= 0;
     if (!ok) return false;
     if (!q) return true;
-    const hay = (b.title + ' ' + b.author + ' ' + b.pub + ' ' + b.tags.join(' ') + ' ' + b.call).toLowerCase();
+    const hay = (b.title + ' ' + b.author + ' ' + b.pub + ' ' + b.tags.join(' ') + ' ' + v.call).toLowerCase();
     return hay.indexOf(q) >= 0;
   });
   grid.innerHTML = list.map(card).join('');
   emptyMsg.hidden = list.length > 0;
-  const hbN = BOOKS.filter(b => !b.need).length;
-  const ilN = BOOKS.filter(b => b.need).length;
-  resultLine.innerHTML = '전체 <b>' + BOOKS.length + '권</b> · ✅ 흥부 <b>' + hbN + '권</b> · 🔄 상호대차 <b>' + ilN + '권</b>' +
+  const hbN = baseList.filter(b => !getView(b).need).length;
+  const ilN = baseList.filter(b => getView(b).need).length;
+  const sn = shortName(baseLib);
+  resultLine.innerHTML = (isHB
+    ? '전체 <b>' + baseList.length + '권</b> · ✅ ' + sn + ' <b>' + hbN + '권</b> · 🔄 상호대차 <b>' + ilN + '권</b>'
+    : '북울진 소장 <b>' + baseList.length + '권</b> (상호대차 제외)') +
     ' &nbsp;|&nbsp; 지금 <b>' + list.length + '권</b>';
   emptyMsg.textContent = (filter === 'fav') ? '찜한 책이 아직 없어요. 카드 오른쪽 ♡를 눌러 담아 보세요.' : '조건에 맞는 책이 없어요.';
 }
+
+document.getElementById('baseLibSwitch').addEventListener('click', e => {
+  const btn = e.target.closest('.lib-opt');
+  if (!btn) return;
+  baseLib = btn.dataset.lib;
+  store.set('heungbu_base_lib_v1', baseLib);
+  render();
+});
 
 document.getElementById('chips').addEventListener('click', e => {
   const btn = e.target.closest('.chip');
@@ -1843,7 +1894,7 @@ grid.addEventListener('click', e => {
   const cp = e.target.closest('[data-copy-req]');
   if (cp){
     const title = cp.dataset.copyReq;
-    const msg = '흥부도서관 수령으로 "' + title + '" 상호대차 신청해 주세요';
+    const msg = shortName(baseLib) + ' 수령으로 "' + title + '" 상호대차 신청해 주세요';
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(msg).catch(()=>{});
     }
