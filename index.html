@@ -38,7 +38,7 @@ h1,h2,h3,h4{margin:0; line-height:1.3}
 .tab{flex:1 1 0; min-height:44px; padding:0 12px; border-radius:999px; border:1px solid var(--line);
   background:#fff; color:var(--ink-soft); font-size:14.5px; font-weight:700; cursor:pointer; white-space:nowrap}
 .tab[aria-selected="true"]{background:var(--green); border-color:var(--green); color:#fff}
-main{padding:16px 0 36px}
+main{padding:12px 0 32px}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 .card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow)}
@@ -48,7 +48,7 @@ main{padding:16px 0 36px}
 .tiny{font-size:12px}
 
 /* ── 검색·필터 ── */
-.toolbar{background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:12px; margin-bottom:12px}
+.toolbar{background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:10px; margin-bottom:10px}
 .searchbox{position:relative; display:flex; align-items:center}
 .searchbox input{width:100%; min-height:46px; padding:0 44px 0 42px; border-radius:12px; border:1px solid var(--line);
   background:#fbfaf7; font-size:16px; color:var(--ink)}
@@ -57,9 +57,11 @@ main{padding:16px 0 36px}
 .searchbox .clear{position:absolute; right:6px; width:36px; height:36px; border:0; border-radius:50%; background:transparent;
   color:var(--ink-soft); font-size:18px; cursor:pointer; display:none}
 .searchbox.has-value .clear{display:block}
-.chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
-.chip{min-height:36px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:#fff;
-  color:var(--ink-soft); font-size:13.5px; font-weight:700; cursor:pointer}
+.chips{display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-top:9px; padding-bottom:1px;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto; min-height:36px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:#fff;
+  color:var(--ink-soft); font-size:13.5px; font-weight:700; cursor:pointer; white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fff}
 .chip.hb[aria-pressed="true"]{background:var(--green); border-color:var(--green)}
 .chip.il[aria-pressed="true"]{background:var(--orange); border-color:var(--orange)}
