@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1f6f4a">
+<title>흥부작은도서관 · 22년생 추천 그림책</title>
+<style>
+:root{
+  --bg:#f6f4ef; --card:#ffffff; --ink:#1c2321; --ink-soft:#5b6560; --line:#e3ded3;
+  --green:#1f6f4a; --green-soft:#e6f4ec; --green-ink:#155c3b;
+  --orange:#b25a00; --orange-soft:#fff0dd; --blue:#1d5fa8; --blue-soft:#e7f0fb;
+  --red:#b3261e;
+  --shadow:0 1px 2px rgba(16,24,20,.06), 0 8px 24px rgba(16,24,20,.06);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","맑은 고딕","Malgun Gothic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  line-height:1.55; font-size:16px; word-break:keep-all;}
+a{color:var(--blue); text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{margin:0; line-height:1.3}
+.wrap{max-width:1040px; margin:0 auto; padding:0 16px}
+
+/* ── 헤더 ── */
+.hero{background:linear-gradient(160deg,#1f6f4a 0%,#2b8a5c 55%,#3f9e6d 100%); color:#fff; padding:18px 0 16px;}
+.hero .kicker{margin:0 0 4px; font-size:12.5px; letter-spacing:.04em; opacity:.85}
+.hero h1{font-size:clamp(20px,5vw,28px); font-weight:800; letter-spacing:-.02em}
+.hero h1 span{font-weight:600; font-size:.62em; opacity:.92; display:inline-block; margin-top:3px}
+
+/* ── 탭 ── */
+.tabs{position:sticky; top:0; z-index:20; background:rgba(246,244,239,.95); backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line); padding:8px 0}
+.tabs .wrap{display:flex; gap:6px}
+.tab{flex:1 1 0; min-height:44px; padding:0 12px; border-radius:999px; border:1px solid var(--line);
+  background:#fff; color:var(--ink-soft); font-size:14.5px; font-weight:700; cursor:pointer; white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--green); border-color:var(--green); color:#fff}
+main{padding:16px 0 36px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow)}
+.pad{padding:14px}
+.muted{color:var(--ink-soft)}
+.small{font-size:13px}
+.tiny{font-size:12px}
+
+/* ── 검색·필터 ── */
+.toolbar{background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:12px; margin-bottom:12px}
+.searchbox{position:relative; display:flex; align-items:center}
+.searchbox input{width:100%; min-height:46px; padding:0 44px 0 42px; border-radius:12px; border:1px solid var(--line);
+  background:#fbfaf7; font-size:16px; color:var(--ink)}
+.searchbox input:focus{outline:2px solid #9ed0b4; border-color:#8cc7a7; background:#fff}
+.searchbox .ico{position:absolute; left:13px; font-size:16px; opacity:.6}
+.searchbox .clear{position:absolute; right:6px; width:36px; height:36px; border:0; border-radius:50%; background:transparent;
+  color:var(--ink-soft); font-size:18px; cursor:pointer; display:none}
+.searchbox.has-value .clear{display:block}
+.chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
+.chip{min-height:36px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:#fff;
+  color:var(--ink-soft); font-size:13.5px; font-weight:700; cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fff}
+.chip.hb[aria-pressed="true"]{background:var(--green); border-color:var(--green)}
+.chip.il[aria-pressed="true"]{background:var(--orange); border-color:var(--orange)}
+.result-line{margin:0 0 10px; font-size:13.5px; color:var(--ink-soft)}
+
+/* ── 책 카드 ── */
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px}
+.book{background:var(--card); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow);
+  padding:14px; display:flex; flex-direction:column; gap:9px}
+.book.hb{border-left:4px solid var(--green)}
+.book.il{border-left:4px solid var(--orange)}
+.book-top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px}
+.badge{display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border-radius:999px; font-size:12px; font-weight:800}
+.badge.hb{background:var(--green-soft); color:var(--green-ink); border:1px solid #bfe3cf}
+.badge.il{background:var(--orange-soft); color:var(--orange); border:1px solid #ffd8a8}
+.badge.wait{background:#f0efe9; color:#6b6b62; border:1px solid #e0ded2}
+.fav{flex:0 0 auto; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:#fff;
+  font-size:17px; cursor:pointer; color:#b9b3a6; line-height:1}
+.fav[aria-pressed="true"]{color:#d93b6a; border-color:#f3c2d1; background:#fff5f8}
+.book h3{font-size:16.5px; font-weight:800; letter-spacing:-.02em}
+.book .meta{font-size:12.5px; color:var(--ink-soft); margin:0}
+.rowline{display:flex; flex-wrap:wrap; align-items:center; gap:6px}
+.pill{font-size:12px; font-weight:700; padding:2px 8px; border-radius:8px; background:#f4f2ec; color:#4b544f; border:1px solid var(--line)}
+.pill.ok{background:var(--green-soft); color:var(--green-ink); border-color:#bfe3cf}
+.pill.no{background:#f6eeee; color:#8a4b46; border-color:#ecd6d4}
+.pill.tags{background:var(--blue-soft); color:var(--blue); border-color:#cfe0f5}
+.call{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px}
+.libs{display:flex; flex-wrap:wrap; gap:5px}
+.lib{font-size:11.5px; padding:3px 7px; border-radius:8px; background:#faf9f5; border:1px solid var(--line); color:#4b544f}
+.lib b{font-weight:800}
+.lib.here{background:var(--green-soft); border-color:#bfe3cf; color:var(--green-ink)}
+.lib.away{background:#fffaf1; border-color:#f0e2cc; color:#7a5a25}
+.lib .dot{display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:4px; vertical-align:1px}
+.dot.ok{background:#2f9e63}.dot.no{background:#c2705c}.dot.na{background:#b9b3a6}
+.reason{margin:0; font-size:13.5px; color:#333b37; background:#fbfaf6; border:1px dashed var(--line); border-radius:10px; padding:9px 10px}
+.book-foot{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:auto}
+.linkbtn{font-size:13px; font-weight:700; min-height:36px; display:inline-flex; align-items:center; gap:5px; padding:0 10px;
+  border-radius:9px; border:1px solid var(--line); background:#fff; color:var(--blue)}
+.empty{text-align:center; padding:28px 12px; color:var(--ink-soft); background:var(--card); border:1px dashed var(--line); border-radius:var(--r)}
+
+/* ── 대출·반납 ── */
+.loans{list-style:none; padding:0; margin:0; display:grid; gap:8px}
+.loan{border:1px solid var(--line); border-radius:12px; padding:11px 12px; background:#fff; display:grid; gap:6px}
+.loan-top{display:flex; justify-content:space-between; gap:8px; align-items:flex-start}
+.loan h4{font-size:14.5px; margin:0}
+.loan .who{font-size:12px; color:var(--ink-soft)}
+.dday{font-weight:900; font-size:15px; padding:3px 9px; border-radius:8px; white-space:nowrap}
+.dday.now{background:var(--green-soft); color:var(--green-ink)}
+.dday.soon{background:var(--orange-soft); color:var(--orange)}
+.dday.over{background:#fdeceb; color:var(--red)}
+.loan-actions{display:flex; gap:6px; flex-wrap:wrap}
+.mini{min-height:34px; padding:0 10px; border-radius:8px; border:1px solid var(--line); background:#fff; font-size:12.5px; font-weight:800; cursor:pointer; color:#48514c}
+.mini:hover{background:#f7f5ef}
+.mini.danger{color:var(--red); border-color:#eccfcd}
+.form{display:grid; gap:10px}
+.field{display:grid; gap:5px}
+.field label{font-size:13px; font-weight:800; color:#3c443f}
+.field input[type=text], .field input[type=date], .field select{
+  min-height:44px; padding:8px 11px; border-radius:10px; border:1px solid var(--line); font-size:15px; background:#fbfaf7; color:var(--ink); width:100%}
+.field input:focus, .field select:focus{outline:2px solid #9ed0b4; border-color:#8cc7a7; background:#fff}
+.form-row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+@media(max-width:620px){ .form-row{grid-template-columns:1fr} }
+.check{display:flex; align-items:center; gap:9px; font-size:14px; font-weight:700; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fbfaf7}
+.check input{width:20px; height:20px}
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:42px; padding:0 15px;
+  border-radius:999px; font-size:14.5px; font-weight:700; border:1px solid transparent; cursor:pointer}
+.btn.primary{background:var(--green); color:#fff}
+.result{display:none; margin-top:10px; border:1px solid #bfe3cf; background:var(--green-soft); border-radius:12px; padding:12px}
+.result.show{display:block}
+.result .big{font-size:18px; font-weight:800; color:var(--green-ink)}
+.kv{display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:13.5px; margin:8px 0 0}
+.kv dt{color:var(--ink-soft); font-weight:700}
+.kv dd{margin:0; font-weight:700}
+.sec-title{font-size:15px; font-weight:800; margin:16px 0 8px; display:flex; align-items:center; gap:6px}
+.sec-title:first-child{margin-top:0}
+footer{border-top:1px solid var(--line); padding:14px 0 26px; color:var(--ink-soft); font-size:11.5px}
+footer p{margin:0}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">22년생 · 만 4~5세</p>
+    <h1>흥부작은도서관 <span>추천 그림책 30권</span></h1>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="화면 선택">
+  <div class="wrap">
+    <button class="tab" id="tabBtn-books" role="tab" aria-selected="true" aria-controls="tab-books">📚 추천도서</button>
+    <button class="tab" id="tabBtn-loans" role="tab" aria-selected="false" aria-controls="tab-loans">📅 내 대출·반납</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ══════════ 추천도서 ══════════ -->
+  <section class="tab-panel active" id="tab-books" role="tabpanel" aria-labelledby="tabBtn-books">
+    <div class="toolbar">
+      <div class="searchbox" id="searchBox">
+        <span class="ico">🔍</span>
+        <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="제목·저자·출판사로 찾기 (예: 수박)">
+        <button class="clear" id="clearQ" type="button" aria-label="검색어 지우기">✕</button>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="빠른 필터">
+        <button class="chip" data-filter="all" aria-pressed="true">전체</button>
+        <button class="chip hb" data-filter="here" aria-pressed="false">✅ 흥부 바로 대출</button>
+        <button class="chip il" data-filter="need" aria-pressed="false">🔄 상호대차 필요</button>
+        <button class="chip" data-filter="tag:상상·모험" aria-pressed="false">상상·모험</button>
+        <button class="chip" data-filter="tag:생활·감정" aria-pressed="false">생활·감정</button>
+        <button class="chip" data-filter="tag:사회성·우정" aria-pressed="false">사회성·우정</button>
+        <button class="chip" data-filter="tag:유치원·학교" aria-pressed="false">유치원·학교</button>
+        <button class="chip" data-filter="tag:옛이야기" aria-pressed="false">옛이야기</button>
+        <button class="chip" data-filter="fav" aria-pressed="false">♥ 내 찜</button>
+      </div>
+    </div>
+    <p class="result-line" id="resultLine"></p>
+    <p class="result-line" style="margin-top:-4px"><span class="lib" style="padding:2px 6px"><span class="dot ok"></span>대출가능</span> <span class="lib" style="padding:2px 6px"><span class="dot no"></span>대출중</span> <span class="lib" style="padding:2px 6px"><span class="dot na"></span>대출불가</span></p>
+    <div class="grid" id="bookGrid"></div>
+    <p class="empty" id="emptyMsg" hidden>조건에 맞는 책이 없어요.</p>
+  </section>
+
+  <!-- ══════════ 내 대출·반납 ══════════ -->
+  <section class="tab-panel" id="tab-loans" role="tabpanel" aria-labelledby="tabBtn-loans">
+    <h2 class="sec-title">대출 중 <span class="small muted" id="loanCount"></span></h2>
+    <div class="card pad">
+      <ul class="loans" id="loanList"></ul>
+      <p class="empty" id="loanEmpty" style="border:1px dashed var(--line)">대출 중인 책이 없어요.</p>
+    </div>
+
+    <h2 class="sec-title">새 대출 추가</h2>
+    <div class="card pad">
+      <form class="form" id="loanForm" autocomplete="off">
+        <div class="field">
+          <label for="l_title">책 제목</label>
+          <input type="text" id="l_title" placeholder="예: 수박 수영장" required>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="l_lib">수령·반납 도서관</label>
+            <select id="l_lib">
+              <option value="small" selected>흥부작은도서관 (일요일 휴관)</option>
+              <option value="big">북울진·울진남부도서관 (월요일 휴관)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="l_date">대출일</label>
+            <input type="date" id="l_date" required>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="l_inter"> 상호대차로 받은 책</label>
+        <div><button class="btn primary" type="submit">추가하기</button></div>
+      </form>
+      <div class="result" id="calcResult"></div>
+    </div>
+
+    <div style="margin-top:14px">
+      <button class="mini danger" id="resetAll" type="button">찜·일정 모두 지우기</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>소장 정보 2026-11-22 조회 · 울진군 통합도서관 자료검색</p>
+  </div>
+</footer>
+
+<script>
+/* ────────── 도서 데이터 ────────── */
+const BOOKS = [
+{
+"id": "js",
+"title": "장수탕 선녀님",
+"author": "백희나",
+"pub": "책읽는곰",
+"year": "2012",
+"call": "유813.8-백97ㅈ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험"
+],
+"reason": "목욕탕에 나타난 선녀와 할머니의 엉뚱한 하룻밤. 익숙한 목욕탕이 상상의 공간으로 바뀌는 재미가 커요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-백97ㅈ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-백97ㅈ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-백97ㅈ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-백97ㅈ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "유813.8-백97ㅈ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "유813.8-백97ㅈ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "유813.8-백97ㅈ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유808-책68ㄱ-7",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "813.7-백97ㅈ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "als",
+"title": "알사탕",
+"author": "백희나",
+"pub": "책읽는곰",
+"year": "2016",
+"call": "유813.8-백97ㅇ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"생활·감정",
+"상상·모험"
+],
+"reason": "알사탕을 먹으면 마음의 소리가 들려요. 친구의 마음을 헤아리는 공감을 배우는 책.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-백97ㅇ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.7-백97ㅇ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-백97알ㅅ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-백97ㅇ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "유813.7-백97ㅇ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "유813.8-백97ㅇ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "유아813.7-백97ㅇ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유808-책68ㄱ-39",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "813.7-백97ㅇ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "gb",
+"title": "구름빵",
+"author": "백희나",
+"pub": "한솔수북",
+"year": "2019",
+"call": "유813.8-백97ㄱ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험"
+],
+"reason": "구름으로 만든 빵을 먹고 하늘을 나는 남매 이야기. 상상과 가족 사랑이 함께 담겼어요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-백97ㄱ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-백97ㄱ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-백97구",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-백97ㄱ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "유813.7-백97ㄱ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "813.8-백97ㄱ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.8-백97ㄱ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "813.8-백97ㄱ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "sb",
+"title": "수박 수영장",
+"author": "안녕달",
+"pub": "창비",
+"year": "2015",
+"call": "유813.8-안194ㅅ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험"
+],
+"reason": "수박 속이 시원한 수영장으로 변해요. 글자가 적어 그림만으로도 이야기를 따라갈 수 있어요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-안194ㅅ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-안ㅅ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-안194ㅅ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-안19ㅅ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "813.8-안19ㅅ=1",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.8-안19ㅅ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "813.8-안19ㅅ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "meri",
+"title": "메리",
+"author": "안녕달",
+"pub": "사계절",
+"year": "2020",
+"call": "유813.8-안194ㅁ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"생활·감정"
+],
+"reason": "곰 인형 메리를 기다리는 마음. 소중한 것을 잃고 다시 만나는 감정을 천천히 느껴요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-안194ㅁ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-안194ㅁ",
+"status": "대출중",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-안19ㅁ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "813.7-안194ㅁ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "813.7-안19ㅁ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "유813.7-김78ㅁ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "dang",
+"title": "당근 유치원",
+"author": "안녕달",
+"pub": "창비",
+"year": "2020",
+"call": "유813.8-안194ㄷ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"유치원·학교"
+],
+"reason": "당근을 싫어하는 아이가 유치원에서 당근과 친해져요. 유치원 생활과 편식 고민을 웃음으로 풀어요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-안194ㄷ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-안194ㄷ",
+"status": "대출중",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-안19ㄷ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "유813.8-안194ㄷ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "유아813.7-안194ㄷ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.7-안194ㄷ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "유813.8-안194ㄷ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "pat",
+"title": "팥빙수의 전설",
+"author": "이지은",
+"pub": "웅진주니어",
+"year": "2019",
+"call": "유813.8-이78ㅍ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험"
+],
+"reason": "호랑이와 팥빙수로 얽힌 옛이야기풍 상상. 반복되는 대사가 많아 소리 내어 읽기 좋아요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-이78ㅍ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-이78ㅍ",
+"status": "대출중",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.8-이78ㅍ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "813.7-이78ㅍ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "813.8-이79ㅍ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.7-이78ㅍ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "유813.7-이78ㅍ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "ipa",
+"title": "이파라파냐무냐무",
+"author": "이지은",
+"pub": "사계절",
+"year": "2020",
+"call": "유813.8-이78ㅇ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험"
+],
+"reason": "이상한 주문을 외우면 무슨 일이든 일어나요. 말의 재미와 상상력을 키워 주는 책.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-이78ㅇ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-이78ㅇ2",
+"status": "대출가능",
+"loc": "[북울진]초등연계"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-이78이",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.8-이78ㅇ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "유813.7-이78ㅇ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.8-이78ㅇ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "유813.7-이78ㅇ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "chg",
+"title": "친구의 전설",
+"author": "이지은",
+"pub": "웅진주니어",
+"year": "2021",
+"call": "유813.8-이78ㅊ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"사회성·우정"
+],
+"reason": "혼자 놀던 아이에게 친구가 생기는 과정. 친구 사귀기와 마음 나누기를 배워요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-이78ㅊ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-이78ㅊ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-이78친",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.8-이78ㅊ",
+"status": "대출중",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "유813.8-이78ㅊ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.8-이78ㅊ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "유813.8-이78ㅊ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "nun",
+"title": "눈물바다",
+"author": "서현",
+"pub": "사계절",
+"year": "2014",
+"call": "유813.8-서94ㄴ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"생활·감정"
+],
+"reason": "슬프면 눈물이 바다가 되는 마을. 감정을 억누르지 않고 표현해도 괜찮다는 걸 알려 줘요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-서94ㄴ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-서94ㄴ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-서94ㄴ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.8-서94ㄴ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "813.8-서94ㄴ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "813.8-서94ㄴ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.8-서94ㄴ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "813.8-서94ㄴ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "gab",
+"title": "가방 들어주는 아이",
+"author": "고정욱",
+"pub": "사계절",
+"year": "2020",
+"call": "아813.8-고74ㄱ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"사회성·우정"
+],
+"reason": "힘들어하는 친구의 가방을 들어 주는 마음. 배려와 친절을 자연스럽게 배워요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "아813.8-고74ㄱ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "아808.91-사14-26",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "아808.91-사14ㄱ",
+"status": "대출가능",
+"loc": "[울진작은]아동자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "813.8-고74ㄱ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "813.8-고74ㄱ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "gwaen",
+"title": "괜찮아 아저씨",
+"author": "김경희",
+"pub": "비룡소",
+"year": "2019",
+"call": "유813.8-김14ㄱ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"생활·감정"
+],
+"reason": "늘 '괜찮아'라고 말하는 아저씨와 아이의 따뜻한 이야기. 위로와 안부의 마음을 담았어요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-김14ㄱ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-김14ㄱ",
+"status": "대출중",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-김14ㄱ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+}
+]
+},
+{
+"id": "gwoe",
+"title": "괴물들이 사는 나라",
+"author": "모리스 샌닥",
+"pub": "시공주니어",
+"year": "2017",
+"call": "유843-샌22ㄱ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험",
+"생활·감정"
+],
+"reason": "장난꾸러기 맥스가 괴물들의 왕이 되는 상상 여행. 분노와 상상, 돌아오는 마음을 담았어요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유843-샌22ㄱ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아843-샌22가=3",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유843.5-샌22고",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유843-샌22ㄱ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "유843-샌22ㄱ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+}
+]
+},
+{
+"id": "pado",
+"title": "파도야 놀자",
+"author": "이수지",
+"pub": "비룡소",
+"year": "2017",
+"call": "유813.8-이56ㅍ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험"
+],
+"reason": "글 없이 그림만으로 파도와 노는 하루를 그렸어요. 아이가 자기 말로 이야기를 만들어 볼 수 있어요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-이56ㅍ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유808.91-비295-204",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.8-이56ㅍ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "유808.9-비295ㅂ-204",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.8-이56ㅍ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+}
+]
+},
+{
+"id": "patj",
+"title": "팥죽 할멈과 호랑이",
+"author": "박윤규 글·백희나 그림",
+"pub": "시공주니어",
+"year": "2006",
+"call": "유813.5-박66ㅍ",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"옛이야기"
+],
+"reason": "팥죽 한 그릇으로 호랑이를 이기는 옛이야기. 반복 구조와 리듬이 좋아 4~5세에게 딱 맞아요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.5-박66ㅍ",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아388.111-박67ㅍ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.5-백97ㅍ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "388.311-박66ㅍ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "813.5-배97ㅍ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+}
+]
+},
+{
+"id": "tini",
+"title": "프린세스 캐치! 티니핑 1 : 출발! 프린세스 열차",
+"author": "SAMG 원작·그림",
+"pub": "아이휴먼",
+"year": "2025",
+"call": "유813.8-아68ㅍ-1",
+"loc": "[흥부]종합자료실",
+"status": "대출가능",
+"need": false,
+"tags": [
+"상상·모험"
+],
+"reason": "아이가 좋아하는 티니핑 캐릭터 이야기. 좋아하는 캐릭터로 글 읽기에 흥미를 붙이기 좋아요.",
+"libs": [
+{
+"n": "흥부작은도서관",
+"call": "유813.8-아68ㅍ-1",
+"status": "대출가능",
+"loc": "[흥부]종합자료실"
+}
+]
+},
+{
+"id": "wae",
+"title": "왜냐면…",
+"author": "안녕달",
+"pub": "책읽는곰",
+"year": "2017",
+"call": "유아813.7-안19ㅇ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"상상·모험"
+],
+"reason": "'왜냐면'으로 이어지는 엉뚱한 이유들. 상상력과 말놀이를 자극하는 안녕달 그림책.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아813.7-안19ㅇ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-안194ㅇ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유813.7-안19ㅇ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "813.8-안194ㅇ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "유아813.7-안194ㅇ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유808-책68ㄱ-40",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+}
+]
+},
+{
+"id": "heom",
+"title": "으뜸 헤엄이",
+"author": "레오 리오니",
+"pub": "마루벌",
+"year": "2010",
+"call": "유아843-레65ㅇ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"사회성·우정"
+],
+"reason": "작은 물고기 헤엄이가 큰 꿈을 이루는 이야기. 자신감과 용기를 담았어요.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아843-레65ㅇ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유843.5-리65ㅇ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유843-리65ㅇ",
+"status": "대출중",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "유843-리65으",
+"status": "대출불가",
+"loc": "[근남]제본수리"
+},
+{
+"n": "매화작은도서관",
+"call": "유843-리65ㅇ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유843-리65ㅇ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+}
+]
+},
+{
+"id": "peter",
+"title": "피터의 의자",
+"author": "에즈라 잭 키츠",
+"pub": "시공주니어",
+"year": "2006",
+"call": "유아843-에77ㅍ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"사회성·우정",
+"생활·감정"
+],
+"reason": "동생이 생겨 의자를 빼앗길 뻔한 피터의 마음. 형제 관계와 성장을 담은 고전.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아843-에77ㅍ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유843.5-키85ㅍ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유843-키85ㅍ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "843-에77ㅍ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유808.9-시15ㄴ-45",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+}
+]
+},
+{
+"id": "sunmu",
+"title": "커다란 순무",
+"author": "톨스토이 글·옥슨버리 그림",
+"pub": "시공주니어",
+"year": "2000",
+"call": "유아808.9-헬298ㅋ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"옛이야기"
+],
+"reason": "모두가 힘을 모아 순무를 뽑는 옛이야기. 반복되는 말의 리듬이 좋아 함께 읽기 좋아요.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아808.9-헬298ㅋ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "808-알29ㅋ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+}
+]
+},
+{
+"id": "mandu",
+"title": "손 큰 할머니의 만두 만들기",
+"author": "채인선",
+"pub": "재미마주",
+"year": "2011",
+"call": "아813.8-채68소",
+"loc": "[남부]아동자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"생활·감정"
+],
+"reason": "손이 아주 큰 할머니가 만두를 빚는 겨울 이야기. 나눔과 따뜻함이 가득해요.",
+"libs": [
+{
+"n": "울진남부도서관",
+"call": "아813.8-채68소",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "북울진도서관",
+"call": "유아813.8-채69ㅅ",
+"status": "대출중",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "아813.8-채68ㅅ",
+"status": "대출가능",
+"loc": "[울진작은]아동자료실"
+},
+{
+"n": "근남작은도서관",
+"call": "813.8-채68ㅅ",
+"status": "대출가능",
+"loc": "[근남]아동자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "810-채68ㅅ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "813.8-채68ㅅ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "평해작은도서관",
+"call": "유813.8-채68ㅅ",
+"status": "대출불가",
+"loc": "[평해]종합자료실"
+}
+]
+},
+{
+"id": "woori",
+"title": "우리는 친구",
+"author": "앤서니 브라운",
+"pub": "웅진주니어",
+"year": "2008",
+"call": "유아808.9-앤53ㅇ",
+"loc": "[북울진]어린이보존자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"사회성·우정"
+],
+"reason": "다른 점이 많아도 함께 놀면 즐거운 친구 이야기. 관계 맺기와 다양성을 배워요.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아808.9-앤53ㅇ",
+"status": "대출가능",
+"loc": "[북울진]어린이보존자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "유843-브292ㅇ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+}
+]
+},
+{
+"id": "chaek",
+"title": "난 책이 좋아요",
+"author": "앤서니 브라운",
+"pub": "웅진주니어",
+"year": "2024",
+"call": "유아843-브292ㄴ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"사회성·우정"
+],
+"reason": "책을 좋아하는 고릴라의 이야기. 책 읽는 즐거움을 알려 주는 그림책.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아843-브292ㄴ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "유843-브292나",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+}
+]
+},
+{
+"id": "pech",
+"title": "작은 조각 페체티노",
+"author": "레오 리오니",
+"pub": "보림",
+"year": "2023",
+"call": "유아859.3-리65ㅈ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"상상·모험"
+],
+"reason": "색 조각들이 모여 별을 만드는 이야기. 작은 것들이 힘을 모으는 과정을 그림으로 보여 줘요.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아859.3-리65ㅈ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+}
+]
+},
+{
+"id": "gorilla",
+"title": "꼬마 고릴라는 억울해",
+"author": "나딘 로베르",
+"pub": "한울림어린이",
+"year": "2024",
+"call": "유아863-나28ㄲ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"생활·감정"
+],
+"reason": "서열 때문에 화가 난 꼬마 고릴라의 마음. 억울함과 화를 다루는 감정 그림책.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아863-나28ㄲ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "863-로44ㄲ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+}
+]
+},
+{
+"id": "gong",
+"title": "나의 공룡 관찰 일기",
+"author": "나가사키 신고",
+"pub": "천개의바람",
+"year": "2026",
+"call": "유아457.279-나12ㄴ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"상상·모험"
+],
+"reason": "공룡을 관찰하며 상상하는 그림일기. 공룡을 좋아하는 아이에게 딱이에요.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아457.279-나12ㄴ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+}
+]
+},
+{
+"id": "yong",
+"title": "용궁 공주와 솜사탕",
+"author": "송태고",
+"pub": "노는날",
+"year": "2026",
+"call": "유아813.7-송883요",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"옛이야기",
+"상상·모험"
+],
+"reason": "용궁에 간 아이의 상상 모험. 우리 옛이야기 분위기의 신비로운 그림책.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아813.7-송883요",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-송883ㅇ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+}
+]
+},
+{
+"id": "mureup",
+"title": "무릎딱지",
+"author": "샤를로트 문드리크",
+"pub": "한울림어린이",
+"year": "2010",
+"call": "유아863-샤23ㅁ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"생활·감정"
+],
+"reason": "자꾸 다치는 아이의 무릎딱지를 통해 몸과 마음을 돌보는 이야기. 유치원 다니는 아이가 공감해요.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아863-샤23ㅁ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "아863-문36ㅁ",
+"status": "대출가능",
+"loc": "[울진작은]아동자료실"
+},
+{
+"n": "매화작은도서관",
+"call": "863-문228ㅁ",
+"status": "대출가능",
+"loc": "[매화]종합자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "아동863-문297ㅁ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+}
+]
+},
+{
+"id": "ddong",
+"title": "똥벼락",
+"author": "김회경",
+"pub": "사계절",
+"year": "2010",
+"call": "유아813.8-김95ㄸ",
+"loc": "[북울진]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"상상·모험"
+],
+"reason": "똥벼락 맞은 마을의 웃음 폭탄 이야기. 유머와 리듬으로 4~5세가 좋아해요.",
+"libs": [
+{
+"n": "북울진도서관",
+"call": "유아813.8-김95ㄸ",
+"status": "대출가능",
+"loc": "[북울진]유아자료실"
+},
+{
+"n": "울진남부도서관",
+"call": "유813.8-김95ㄸ",
+"status": "대출가능",
+"loc": "[남부]아동자료실"
+},
+{
+"n": "울진작은도서관",
+"call": "813.8-김95ㄸ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+},
+{
+"n": "기성작은도서관",
+"call": "813.8-김95ㄸ",
+"status": "대출가능",
+"loc": "[기성]종합자료실"
+},
+{
+"n": "온정작은도서관",
+"call": "813.8-김95ㄸ",
+"status": "대출가능",
+"loc": "[온정]종합자료실"
+}
+]
+},
+{
+"id": "zoo",
+"title": "동물원",
+"author": "이수지",
+"pub": "비룡소",
+"year": "2022",
+"call": "유813.8-이56ㄷ",
+"loc": "[울진작은]유아자료실",
+"status": "대출가능",
+"need": true,
+"tags": [
+"상상·모험"
+],
+"reason": "동물원에 간 하루를 글 없이 그림으로 담았어요. 아이가 그림을 보며 이야기를 만들어요.",
+"libs": [
+{
+"n": "울진작은도서관",
+"call": "유813.8-이56ㄷ",
+"status": "대출가능",
+"loc": "[울진작은]유아자료실"
+}
+]
+}
+];
+
+const HOLIDAYS = {
+"2026-01-01": "신정",
+"2026-02-16": "설날 연휴",
+"2026-02-17": "설날",
+"2026-02-18": "설날 연휴",
+"2026-03-01": "삼일절",
+"2026-03-02": "대체공휴일(삼일절)",
+"2026-05-01": "노동절",
+"2026-05-05": "어린이날",
+"2026-05-24": "부처님오신날",
+"2026-05-25": "대체공휴일(부처님오신날)",
+"2026-06-03": "지방선거일",
+"2026-06-06": "현충일",
+"2026-07-17": "제헌절",
+"2026-08-15": "광복절",
+"2026-08-17": "대체공휴일(광복절)",
+"2026-09-24": "추석 연휴",
+"2026-09-25": "추석",
+"2026-09-26": "추석 연휴",
+"2026-10-03": "개천절",
+"2026-10-05": "대체공휴일(개천절)",
+"2026-10-09": "한글날",
+"2026-12-25": "성탄절",
+"2027-01-01": "신정",
+"2027-02-06": "설날 연휴",
+"2027-02-07": "설날",
+"2027-02-08": "설날 연휴",
+"2027-02-09": "대체공휴일(설날)",
+"2027-03-01": "삼일절",
+"2027-05-01": "노동절",
+"2027-05-03": "대체공휴일(노동절)",
+"2027-05-05": "어린이날",
+"2027-05-13": "부처님오신날",
+"2027-06-06": "현충일",
+"2027-07-17": "제헌절",
+"2027-07-19": "대체공휴일(제헌절)",
+"2027-08-15": "광복절",
+"2027-08-16": "대체공휴일(광복절)",
+"2027-09-14": "추석 연휴",
+"2027-09-15": "추석",
+"2027-09-16": "추석 연휴",
+"2027-10-03": "개천절",
+"2027-10-04": "대체공휴일(개천절)",
+"2027-10-09": "한글날",
+"2027-10-11": "대체공휴일(한글날)",
+"2027-12-25": "성탄절",
+"2027-12-27": "대체공휴일(성탄절)"
+};
+
+/* ────────── 저장소 ────────── */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const INITIAL_LOANS = [
+  {title:'[학콕3-4-4] 우리 동네 청수마트 : 이작은 그림책', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'엄마, 나 안 졸려! : 리커버', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'바람숲 도서관', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'불꽃놀이', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
+  {title:'조마조마 북', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'}
+];
+let FAV = new Set(store.get('heungbu_fav_v1', []));
+let LOANS = store.get('heungbu_loans_v3', INITIAL_LOANS);
+
+/* ────────── 날짜 도구 ────────── */
+const MS = 86400000;
+function ymd(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function parseYmd(s){ const p = s.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); }
+function today0(){ const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function addDays(d, n){ const x = new Date(d.getTime()); x.setDate(x.getDate() + n); return x; }
+function daysBetween(a, b){ return Math.round((b.getTime() - a.getTime()) / MS); }
+const WD = ['일','월','화','수','목','금','토'];
+function label(d){ return (d.getMonth()+1) + '월 ' + d.getDate() + '일(' + WD[d.getDay()] + ')'; }
+function labelFull(d){ return d.getFullYear() + '. ' + label(d); }
+function holidayName(d){ return HOLIDAYS[ymd(d)] || null; }
+function isClosed(d, type){
+  if (holidayName(d)) return true;
+  if (type === 'big') return d.getDay() === 1;
+  return d.getDay() === 0;
+}
+function nextOpen(d, type){
+  let x = new Date(d.getTime()), guard = 0;
+  while (isClosed(x, type) && guard < 30){ x = addDays(x, 1); guard++; }
+  return x;
+}
+
+/* ────────── 탭 ────────── */
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', String(b === btn)));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === btn.getAttribute('aria-controls')));
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  });
+});
+
+/* ────────── 도서 목록 ────────── */
+const grid = document.getElementById('bookGrid');
+const resultLine = document.getElementById('resultLine');
+const emptyMsg = document.getElementById('emptyMsg');
+const qEl = document.getElementById('q');
+const searchBox = document.getElementById('searchBox');
+let filter = 'all';
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function statusClass(st){ return st === '대출가능' ? 'ok' : (st === '대출중' ? 'no' : 'na'); }
+const SHORT = {'흥부작은도서관':'흥부','북울진도서관':'북울진','울진남부도서관':'남부','울진작은도서관':'울진작은','근남작은도서관':'근남','매화작은도서관':'매화','기성작은도서관':'기성','평해작은도서관':'평해','온정작은도서관':'온정'};
+function shortName(n){ return SHORT[n] || n; }
+function searchUrl(b){
+  const base = 'https://lib.uljin.go.kr/content/01search/01_01.php?TAG1_cmd=IT&sh_TYPE=dan_book&TAG1_keyword=';
+  const key = b.title.replace(/\s*:\s*.*$/, '').replace(/^\(.*?\)\s*/, '');
+  return base + encodeURIComponent(key);
+}
+function badge(b){
+  if (b.need) return '<span class="badge il">🔄 상호대차 필요</span>';
+  if (b.status === '대출가능') return '<span class="badge hb">✅ 흥부 바로 대출</span>';
+  return '<span class="badge wait">📕 흥부 소장 · 대출중</span>';
+}
+function libChips(b){
+  return b.libs.map(l => {
+    const cls = l.n === '흥부작은도서관' ? 'lib here' : 'lib away';
+    return '<span class="' + cls + '" title="' + esc(l.n + ' · ' + l.loc + ' · ' + l.call + ' · ' + l.status) + '">' +
+      '<span class="dot ' + statusClass(l.status) + '"></span><b>' + esc(shortName(l.n)) + '</b> ' + esc(l.call) + '</span>';
+  }).join('');
+}
+function footNote(b){
+  if (b.need) return '<span class="small muted">' + esc(shortName(b.libs[0].n)) + ' 소장 → 흥부에서 수령</span>';
+  return '<span class="small muted">' + esc(b.loc) + '</span>';
+}
+function card(b){
+  const isFav = FAV.has(b.id);
+  const cls = b.need ? 'il' : 'hb';
+  const stPill = '<span class="pill ' + (b.status === '대출가능' ? 'ok' : (b.status === '대출중' ? 'no' : '')) + '">' + esc(b.status) + '</span>';
+  return '<article class="book ' + cls + '" data-id="' + b.id + '">' +
+    '<div class="book-top">' + badge(b) +
+      '<button class="fav" data-fav="' + b.id + '" aria-pressed="' + isFav + '" aria-label="' + esc(b.title) + ' 찜하기">' + (isFav ? '♥' : '♡') + '</button>' +
+    '</div>' +
+    '<h3>' + esc(b.title) + '</h3>' +
+    '<p class="meta">' + esc(b.author || '-') + ' · ' + esc(b.pub || '-') + (b.year ? ' · ' + esc(b.year) : '') + '</p>' +
+    '<div class="rowline">' + stPill +
+      '<span class="pill call">' + esc(b.call) + '</span>' +
+      b.tags.map(t => '<span class="pill tags">' + esc(t) + '</span>').join('') +
+    '</div>' +
+    '<div class="libs">' + libChips(b) + '</div>' +
+    '<p class="reason">' + esc(b.reason) + '</p>' +
+    '<div class="book-foot">' +
+      '<a class="linkbtn" href="' + searchUrl(b) + '" target="_blank" rel="noopener">도서관에서 보기 ↗</a>' +
+      footNote(b) +
+    '</div>' +
+  '</article>';
+}
+
+function render(){
+  const q = qEl.value.trim().toLowerCase();
+  searchBox.classList.toggle('has-value', qEl.value.length > 0);
+  const list = BOOKS.filter(b => {
+    let ok = true;
+    if (filter === 'here') ok = !b.need && b.status === '대출가능';
+    else if (filter === 'need') ok = b.need;
+    else if (filter === 'fav') ok = FAV.has(b.id);
+    else if (filter.indexOf('tag:') === 0) ok = b.tags.indexOf(filter.slice(4)) >= 0;
+    if (!ok) return false;
+    if (!q) return true;
+    const hay = (b.title + ' ' + b.author + ' ' + b.pub + ' ' + b.tags.join(' ') + ' ' + b.call).toLowerCase();
+    return hay.indexOf(q) >= 0;
+  });
+  grid.innerHTML = list.map(card).join('');
+  emptyMsg.hidden = list.length > 0;
+  const hbN = BOOKS.filter(b => !b.need).length;
+  const ilN = BOOKS.filter(b => b.need).length;
+  resultLine.innerHTML = '전체 <b>' + BOOKS.length + '권</b> · ✅ 흥부 <b>' + hbN + '권</b> · 🔄 상호대차 <b>' + ilN + '권</b>' +
+    ' &nbsp;|&nbsp; 지금 <b>' + list.length + '권</b>';
+  emptyMsg.textContent = (filter === 'fav') ? '찜한 책이 아직 없어요. 카드 오른쪽 ♡를 눌러 담아 보세요.' : '조건에 맞는 책이 없어요.';
+}
+
+document.getElementById('chips').addEventListener('click', e => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  filter = btn.dataset.filter;
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === btn)));
+  render();
+});
+qEl.addEventListener('input', render);
+document.getElementById('clearQ').addEventListener('click', () => { qEl.value = ''; render(); qEl.focus(); });
+grid.addEventListener('click', e => {
+  const btn = e.target.closest('[data-fav]');
+  if (!btn) return;
+  const id = btn.dataset.fav;
+  if (FAV.has(id)) FAV.delete(id); else FAV.add(id);
+  store.set('heungbu_fav_v1', Array.from(FAV));
+  btn.setAttribute('aria-pressed', String(FAV.has(id)));
+  btn.textContent = FAV.has(id) ? '♥' : '♡';
+  if (filter === 'fav') render();
+});
+
+/* ────────── 계산 ────────── */
+function compute(loanDate, type){
+  const base = addDays(loanDate, 15);
+  const due = isClosed(base, type) ? nextOpen(base, type) : base;
+  const extBase = addDays(base, 7);
+  const ext = isClosed(extBase, type) ? nextOpen(extBase, type) : extBase;
+  return {base, due, ext, shifted: ymd(base) !== ymd(due), extShifted: ymd(extBase) !== ymd(ext)};
+}
+
+const form = document.getElementById('loanForm');
+const dateInput = document.getElementById('l_date');
+dateInput.value = ymd(today0());
+const calcResult = document.getElementById('calcResult');
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const title = document.getElementById('l_title').value.trim();
+  if (!title) return;
+  const type = document.getElementById('l_lib').value;
+  const loanDate = parseYmd(dateInput.value);
+  const c = compute(loanDate, type);
+  const dday = daysBetween(today0(), c.due);
+  let html = '<div class="big">' + esc(title) + '</div>';
+  html += '<dl class="kv">';
+  html += '<dt>대출일</dt><dd>' + labelFull(loanDate) + '</dd>';
+  html += '<dt>반납예정일</dt><dd>' + labelFull(c.due) + (c.shifted ? ' <span class="small muted">(휴관일이라 다음 개관일)</span>' : '') + '</dd>';
+  html += '<dt>연장하면</dt><dd>' + labelFull(c.ext) + ' <span class="small muted">(7일)</span></dd>';
+  html += '<dt>남은 날</dt><dd><span class="dday ' + (dday < 0 ? 'over' : (dday <= 3 ? 'soon' : 'now')) + '">' + (dday < 0 ? 'D+' + Math.abs(dday) + ' 연체' : (dday === 0 ? 'D-DAY' : 'D-' + dday)) + '</span></dd>';
+  html += '</dl>';
+  calcResult.innerHTML = html;
+  calcResult.classList.add('show');
+  LOANS.push({title, type, loanDate: ymd(loanDate), interloan: document.getElementById('l_inter').checked, extended: false, added: ymd(new Date())});
+  store.set('heungbu_loans_v3', LOANS);
+  document.getElementById('l_title').value = '';
+  document.getElementById('l_inter').checked = false;
+  renderLoans();
+});
+
+function loanItem(l, i){
+  const type = l.type || 'small';
+  const c = compute(parseYmd(l.loanDate), type);
+  const due = l.extended ? c.ext : c.due;
+  const dday = daysBetween(today0(), due);
+  const cls = dday < 0 ? 'over' : (dday <= 3 ? 'soon' : 'now');
+  const txt = dday < 0 ? 'D+' + Math.abs(dday) + ' 연체' : (dday === 0 ? 'D-DAY' : 'D-' + dday);
+  return '<li class="loan">' +
+    '<div class="loan-top"><div><h4>' + esc(l.title) + '</h4>' +
+      '<div class="who">' + (l.interloan ? '상호대차 · ' : '') + '대출 ' + l.loanDate + '</div></div>' +
+      '<span class="dday ' + cls + '">' + txt + '</span></div>' +
+    '<div class="who">반납 ' + labelFull(due) + (l.extended ? ' · 7일 연장함' : (c.shifted ? ' · 다음 개관일' : '')) + '</div>' +
+    '<div class="loan-actions">' +
+      '<button class="mini" data-ext="' + i + '">' + (l.extended ? '연장 취소' : '7일 연장') + '</button>' +
+      '<button class="mini danger" data-del="' + i + '">삭제</button>' +
+    '</div></li>';
+}
+
+function renderLoans(){
+  const list = document.getElementById('loanList');
+  const empty = document.getElementById('loanEmpty');
+  const cnt = document.getElementById('loanCount');
+  const items = LOANS.map((l, i) => ({l, i}));
+  items.sort((a, b) => {
+    const A = compute(parseYmd(a.l.loanDate), a.l.type || 'small');
+    const B = compute(parseYmd(b.l.loanDate), b.l.type || 'small');
+    return (a.l.extended ? A.ext : A.due) - (b.l.extended ? B.ext : B.due);
+  });
+  list.innerHTML = items.map(x => loanItem(x.l, x.i)).join('');
+  empty.hidden = LOANS.length > 0;
+  cnt.textContent = LOANS.length ? '(' + LOANS.length + '권)' : '';
+}
+document.getElementById('loanList').addEventListener('click', e => {
+  const ext = e.target.closest('[data-ext]');
+  const del = e.target.closest('[data-del]');
+  if (ext){ const i = Number(ext.dataset.ext); LOANS[i].extended = !LOANS[i].extended; store.set('heungbu_loans_v3', LOANS); renderLoans(); }
+  if (del){ const i = Number(del.dataset.del); LOANS.splice(i, 1); store.set('heungbu_loans_v3', LOANS); renderLoans(); }
+});
+
+document.getElementById('resetAll').addEventListener('click', () => {
+  if (!confirm('찜 목록과 대출 일정을 모두 지울까요?')) return;
+  FAV = new Set(); LOANS = [];
+  store.set('heungbu_fav_v1', []); store.set('heungbu_loans_v3', []);
+  render(); renderLoans();
+});
+
+/* ────────── 시작 ────────── */
+render();
+renderLoans();
+</script>
+</body>
+</html>
