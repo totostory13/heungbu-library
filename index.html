@@ -1797,7 +1797,10 @@ function card(b){
         '<ul class="dlibs">' + libRows(b) + '</ul>' +
         '<p class="reason">💬 ' + esc(b.reason) + '</p>' +
         '<div class="drow">' + b.tags.map(t => '<span class="pill tags">' + esc(t) + '</span>').join('') +
-          '<a class="linkbtn" href="' + searchUrl(b) + '" target="_blank" rel="noopener">통합검색에서 보기 ↗</a>' +
+          (b.need
+            ? '<a class="linkbtn" href="' + searchUrl(b) + '" target="_blank" rel="noopener">🔄 상호대차 신청하기 ↗</a>' +
+              '<button type="button" class="linkbtn" data-copy-req="' + esc(b.title) + '" style="background:var(--accent-bg);border-color:var(--accent);color:var(--accent);cursor:pointer">📋 요청 문구 복사</button>'
+            : '<a class="linkbtn" href="' + searchUrl(b) + '" target="_blank" rel="noopener">도서관에서 보기 ↗</a>') +
         '</div>' +
       '</div></div>' +
     '</div>' +
@@ -1837,6 +1840,18 @@ document.getElementById('chips').addEventListener('click', e => {
 qEl.addEventListener('input', render);
 document.getElementById('clearQ').addEventListener('click', () => { qEl.value = ''; render(); qEl.focus(); });
 grid.addEventListener('click', e => {
+  const cp = e.target.closest('[data-copy-req]');
+  if (cp){
+    const title = cp.dataset.copyReq;
+    const msg = '흥부도서관 수령으로 "' + title + '" 상호대차 신청해 주세요';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg).catch(()=>{});
+    }
+    const prev = cp.textContent;
+    cp.textContent = '✅ 복사됨! 채팅에 붙여넣기';
+    setTimeout(() => { cp.textContent = prev; }, 2200);
+    return;
+  }
   const favBtn = e.target.closest('[data-fav]');
   if (favBtn){
     const id = favBtn.dataset.fav;
