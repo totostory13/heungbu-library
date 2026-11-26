@@ -176,7 +176,7 @@ footer p{margin:0}
   <div class="wrap">
     <p class="kicker">22년생 · 만 4~5세</p>
     <h1 id="heroTitle">흥부작은도서관 <span>추천 그림책 30권</span></h1>
-    <p class="sync">반영 기준: 2026-11-22 14:27</p>
+    <p class="sync">반영 기준: 2026-11-26 10:40</p>
   </div>
 </header>
 
@@ -221,7 +221,7 @@ footer p{margin:0}
   <!-- ══════════ 내 대출·반납 ══════════ -->
   <section class="tab-panel" id="tab-loans" role="tabpanel" aria-labelledby="tabBtn-loans">
     <h2 class="sec-title">가족 통합 대출 중 <span class="small muted" id="loanCount"></span></h2>
-    <p class="small muted" style="margin:-2px 0 8px">가족회원 통합 조회 기준 · 본인 5권 · 가족 0권</p>
+    <p class="small muted" style="margin:-2px 0 8px">가족회원 통합 조회 기준 · 본인 5권 · 가족 5권</p>
     <div class="card pad">
       <ul class="loans" id="loanList"></ul>
       <p class="empty" id="loanEmpty" style="border:1px dashed var(--line)">대출 중인 책이 없어요.</p>
@@ -261,7 +261,7 @@ footer p{margin:0}
 
 <footer>
   <div class="wrap">
-    <p>소장 정보 2026-11-22 14:27 조회 · 울진군 통합도서관 자료검색 · 가족이 이미 빌린 책(현재 대출+과거 대출이력)은 추천에서 제외 · 카드를 누르면 청구기호·도서관별 상태가 펼쳐집니다</p>
+    <p>소장 정보 2026-11-26 10:40 조회 · 울진군 통합도서관 자료검색 · 가족이 이미 빌린 책(현재 대출+과거 대출이력)은 추천에서 제외 · 카드를 누르면 청구기호·도서관별 상태가 펼쳐집니다</p>
   </div>
 </footer>
 
@@ -1745,15 +1745,20 @@ const store = {
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 const INITIAL_LOANS = [
-  {title:'[학콕3-4-4] 우리 동네 청수마트 : 이작은 그림책', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'엄마, 나 안 졸려! : 리커버', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'바람숲 도서관', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'불꽃놀이', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'},
-  {title:'조마조마 북', borrower:'본인', type:'small', loanDate:'2026-11-07', interloan:false, extended:true, added:'2026-11-22'}
+  {title:'바바파파 배', borrower:'가족', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'바바파파의 생일파티', borrower:'가족', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'하늘 소풍', borrower:'가족', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'크리스마스 트리', borrower:'가족', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'향수를 만들어요', borrower:'가족', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'바바 가족과 숫자들', borrower:'본인', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'알파벳 랩으로 부르기', borrower:'본인', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'미로 섬으로의 여행', borrower:'본인', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'룰루를 찾아요', borrower:'본인', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'},
+  {title:'과일 주스를 만들어요', borrower:'본인', type:'small', loanDate:'2026-11-25', interloan:false, extended:false, added:'2026-11-26'}
 ];
 let FAV = new Set(store.get('heungbu_fav_v1', []));
 const OPEN = new Set();
-let LOANS = store.get('heungbu_loans_v4', INITIAL_LOANS);
+let LOANS = store.get('heungbu_loans_v5', INITIAL_LOANS);
 
 /* ────────── 날짜 도구 ────────── */
 const MS = 86400000;
@@ -1996,7 +2001,7 @@ form.addEventListener('submit', e => {
   calcResult.innerHTML = html;
   calcResult.classList.add('show');
   LOANS.push({title, borrower:'본인', type, loanDate: ymd(loanDate), interloan: document.getElementById('l_inter').checked, extended: false, added: ymd(new Date())});
-  store.set('heungbu_loans_v4', LOANS);
+  store.set('heungbu_loans_v5', LOANS);
   document.getElementById('l_title').value = '';
   document.getElementById('l_inter').checked = false;
   renderLoans();
@@ -2037,14 +2042,14 @@ function renderLoans(){
 document.getElementById('loanList').addEventListener('click', e => {
   const ext = e.target.closest('[data-ext]');
   const del = e.target.closest('[data-del]');
-  if (ext){ const i = Number(ext.dataset.ext); LOANS[i].extended = !LOANS[i].extended; store.set('heungbu_loans_v4', LOANS); renderLoans(); }
-  if (del){ const i = Number(del.dataset.del); LOANS.splice(i, 1); store.set('heungbu_loans_v4', LOANS); renderLoans(); }
+  if (ext){ const i = Number(ext.dataset.ext); LOANS[i].extended = !LOANS[i].extended; store.set('heungbu_loans_v5', LOANS); renderLoans(); }
+  if (del){ const i = Number(del.dataset.del); LOANS.splice(i, 1); store.set('heungbu_loans_v5', LOANS); renderLoans(); }
 });
 
 document.getElementById('resetAll').addEventListener('click', () => {
   if (!confirm('찜 목록과 대출 일정을 모두 지울까요?')) return;
   FAV = new Set(); LOANS = [];
-  store.set('heungbu_fav_v1', []); store.set('heungbu_loans_v4', []);
+  store.set('heungbu_fav_v1', []); store.set('heungbu_loans_v5', []);
   render(); renderLoans();
 });
 
